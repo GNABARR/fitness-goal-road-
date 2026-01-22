@@ -14,6 +14,26 @@ public class Macronutrients {
         this.fats = fats;
     }
 
+
+
+    public double getCalories() {
+        return calories;
+    }
+
+    public double getProteins() {
+        return proteins;
+    }
+
+    public double getCarbs() {
+        return carbs;
+    }
+
+    public double getFats() {
+        return fats;
+    }
+
+
+
     @Override
     public String toString() {
         return """

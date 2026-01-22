@@ -1,12 +1,7 @@
 package com.fitness.model;
 
 
-public enum ActivityLevel {
-
-    SEDENTAIRE(1.2),
-    MODERE(1.55),
-    ACTIF(1.75),
-    TRES_ACTIF(1.9);
+public enum ActivityLevel {  SEDENTAIRE(1.2),   MODERE(1.55),   ACTIF(1.75),   TRES_ACTIF(1.9);
 
     private final double factor;
 

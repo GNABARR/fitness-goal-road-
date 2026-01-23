@@ -1,10 +1,20 @@
-import React from 'react'
-import MacroPage from './pages/MacroPage'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import HomePage from './pages/HomePage';
+import DietPage from './pages/DietPage';
 
-export default function App() {
+function App() {
     return (
-        <div className="min-h-screen bg-gray-100 text-gray-900 font-sans">
-            <MacroPage />
-        </div>
-    )
+        <Router>
+            <div className="min-h-screen">
+                <Navbar />
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/diet" element={<DietPage />} />
+                </Routes>
+            </div>
+        </Router>
+    );
 }
+
+export default App;

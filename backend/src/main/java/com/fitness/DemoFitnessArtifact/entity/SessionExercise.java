@@ -12,7 +12,7 @@ public class SessionExercise {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
+    @JsonIgnore   // objet java _____> json, eviter les boucles infinia
     @ManyToOne
     @JoinColumn(name="session_id", nullable=false)
     private TrainingSession session;

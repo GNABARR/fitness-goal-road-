@@ -99,3 +99,14 @@ th, td {
   margin-top: 12px;
   font-size: 16px;
 }
+
+.small {
+  font-size: 12px;
+}
+
+.details {
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 10px;
+}

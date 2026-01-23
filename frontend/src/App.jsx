@@ -32,11 +32,11 @@ export default function App() {
   
   const [result, setResult] = useState(null);
   const [sessions, setSessions] = useState([]); 
-  const [expanded, setExpanded] = useState({}); // { [sessionId]: true/false }
+  const [expanded, setExpanded] = useState({}); 
 
   const [message, setMessage] = useState("");
 
-  // Load muscles at start
+  
   useEffect(() => {
     fetch(API_BASE + "/api/muscles")
       .then((res) => res.json())
@@ -44,7 +44,6 @@ export default function App() {
       .catch(() => setMessage("Erreur: impossible de charger les muscles. Vérifie le backend."));
   }, []);
 
-  // Load exercises when muscle changes
   useEffect(() => {
     if (!selectedMuscleId) {
       setExercises([]);
@@ -204,7 +203,7 @@ export default function App() {
 
       {message ? <div className="message">{message}</div> : null}
 
-      {/* 1) Athlete */}
+      {/* Athlete */}
       <div className="card">
         <h2>Athlète</h2>
 
@@ -236,7 +235,7 @@ export default function App() {
         )}
       </div>
 
-      {/* 2) Add session */}
+      {/* session */}
       <div className="card">
         <h2>Séance</h2>
 
@@ -347,7 +346,7 @@ export default function App() {
         </button>
       </div>
 
-      {/* 3) Result */}
+      {/* Result */}
       <div className="card">
         <h2>Résultat (calories brûlées par exercice + total)</h2>
 

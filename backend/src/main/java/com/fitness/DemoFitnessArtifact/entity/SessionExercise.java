@@ -12,7 +12,6 @@ public class SessionExercise {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // JsonIgnore pour éviter boucle JSON (session -> exercices -> session...)
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name="session_id", nullable=false)

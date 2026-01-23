@@ -199,7 +199,7 @@ export default function App() {
 
   return (
     <div className="container">
-      <h1>Fitness Goal Road 💪</h1>
+      <h1>Fitness Goal Road </h1>
 
       {message ? <div className="message">{message}</div> : null}
 

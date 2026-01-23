@@ -28,7 +28,6 @@ public class DataSeeder {
             MuscleGroup calves = muscleRepo.save(new MuscleGroup("Calves (Mollets)"));
             MuscleGroup abs = muscleRepo.save(new MuscleGroup("Abs / Core"));
 
-            // MET indicatifs (simples). Tu peux ajuster après.
             exRepo.save(new Exercise("Barbell Bench Press", 3.5, chest));
             exRepo.save(new Exercise("Incline Bench Press", 3.5, chest));
             exRepo.save(new Exercise("Dumbbell Flyes", 3.5, chest));

@@ -2,14 +2,35 @@ package com.protosirius.backend.entity;
 
 import java.time.Instant;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 
+
+@Entity
+@Table(name = "MesuresBMI")
 public class Measure {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column
     private double poidsKg;
+
+    @Column
     private double tailleCm;
+
+    @Column
     private int bmi;
+
+    @Column
     private String categorie;
+
+    @Column
     private Instant date;
 
     public Measure() {

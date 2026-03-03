@@ -24,7 +24,7 @@ public class BmiService {
         }
 
         double tailleM = tailleCm / 100.0;
-        int bmi = (int) Math.round(poidsKg / (tailleM * tailleM));
+        double bmi = Math.round(poidsKg / (tailleM * tailleM));
 
         Measure measure = new Measure();
         measure.setPoidsKg(poidsKg);
@@ -35,7 +35,7 @@ public class BmiService {
         return repository.save(measure);
     }
 
-    private String categoriserBMI(int bmi) {
+    private String categoriserBMI(double bmi) {
         if (bmi < 18.5) {
             return "Insuffisance pondérale";
         } else if (bmi < 25) {
@@ -47,9 +47,8 @@ public class BmiService {
         }
     }
 
-    public Measure getById(int id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Mesure non trouvée avec l'ID : " + id));
+    public Measure getById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Mesure non trouvée"));
     }
 
 }

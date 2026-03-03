@@ -26,7 +26,7 @@ public class BmiController {
         return BmiResponse.fromMeasure(saved);
     }
 @GetMapping("/{id}")
-    public BmiResponse getById(@PathVariable int id) {
+    public BmiResponse getById(@PathVariable Long id) {
         Measure m = bmiService.getById(id);
         return BmiResponse.fromMeasure(m);
     }

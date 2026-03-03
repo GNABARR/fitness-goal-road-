@@ -16,7 +16,7 @@ import jakarta.persistence.Table;
 public class Measure {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column
     private double poidsKg;
@@ -25,7 +25,7 @@ public class Measure {
     private double tailleCm;
 
     @Column
-    private int bmi;
+    private double bmi;
 
     @Column
     private String categorie;
@@ -36,7 +36,7 @@ public class Measure {
     public Measure() {
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
@@ -55,7 +55,7 @@ public class Measure {
         return tailleCm;
     }   
 
-    public int getBmi() {
+    public double getBmi() {
         return bmi;
     }
 
@@ -68,7 +68,7 @@ public class Measure {
     }
 
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -80,7 +80,7 @@ public class Measure {
         this.tailleCm = tailleCm;
     }
 
-    public void setBmi(int bmi) {
+    public void setBmi(double bmi) {
         this.bmi = bmi;
     }
 

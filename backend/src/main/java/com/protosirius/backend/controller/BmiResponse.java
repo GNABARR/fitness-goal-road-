@@ -4,11 +4,9 @@ import java.time.Instant;
 
 import com.protosirius.backend.entity.Measure;
 
-import jakarta.persistence.criteria.CriteriaBuilder.In;
-
 public class BmiResponse {
-    private int id;
-    private int bmi;
+    private Long id;
+    private double bmi;
     private String categorie;
     private Instant date;
     private double poidsKg;
@@ -25,11 +23,11 @@ public class BmiResponse {
         return response;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public int getBmi() {
+    public double getBmi() {
         return bmi;
     }
 

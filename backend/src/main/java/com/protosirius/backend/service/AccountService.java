@@ -17,6 +17,12 @@ public class AccountService {
                 this.userRepository = userRepository;
         }
 
+
+        public User getAccount(int userId) {
+                return userRepository.findById(userId)
+                                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé , esseye de t'inscrie"));
+        }
+
         public User updateAccount(int userId,String newEmail, String newPassword) {
                 User user = userRepository.findById(userId)
                                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé , esseye de t'inscrie"));

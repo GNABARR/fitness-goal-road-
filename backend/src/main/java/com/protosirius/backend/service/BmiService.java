@@ -51,4 +51,9 @@ public class BmiService {
         return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Mesure non trouvée"));
     }
 
+    public Measure MesureBMIForUser(Integer userId, double poidsKg, double tailleCm) {
+        Measure measure = MesureBMI(poidsKg, tailleCm);
+        measure.setUserId(userId);
+        return repository.save(measure);
+    }
 }

@@ -33,11 +33,18 @@ public class Measure {
     @Column
     private Instant date;
 
+    @Column(name="user_id")
+    private Integer userId;
+
     public Measure() {
     }
 
     public Long getId() {
         return id;
+    }
+
+    public Integer getUserId() {
+        return userId;
     }
 
     @PrePersist
@@ -46,6 +53,7 @@ public class Measure {
             date = Instant.now();
         }
     }
+    
 
     public double getPoidsKg() {
         return poidsKg;
@@ -70,6 +78,10 @@ public class Measure {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public void setPoidsKg(double poidsKg) {

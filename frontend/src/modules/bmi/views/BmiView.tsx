@@ -1,9 +1,11 @@
 import { useState } from "react";
 import BmiForm from "../components/BmiForm.tsx";
 import BmiResultCard from "../components/BmiResultCard";
-import { calculateBmi, type BmiResponse } from "../api/bmiApi";
+import { calculateBmiForUser, type BmiResponse } from "../api/bmiApi";
 
 export default function BmiView() {
+  const userId = 1;
+
   const [result, setResult] = useState<BmiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,7 +15,7 @@ export default function BmiView() {
       setLoading(true);
       setError(null);
 
-      const response = await calculateBmi(data);
+      const response = await calculateBmiForUser(userId, data);
       setResult(response);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unexpected error");

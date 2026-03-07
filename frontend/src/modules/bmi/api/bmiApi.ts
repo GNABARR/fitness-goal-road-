@@ -9,12 +9,16 @@ export type BmiResponse = {
   tailleCm: number;
   bmi: number;
   categorie: string;
+  date: string;
 };
 
-const API_BASE_URL = "/api";
+const API_BASE_URL = "http://localhost:3000/api";
 
-export async function calculateBmi(data: BmiRequest): Promise<BmiResponse> {
-  const response = await fetch(`${API_BASE_URL}/bmi`, {
+export async function calculateBmiForUser(
+  userId: number,
+  data: BmiRequest
+): Promise<BmiResponse> {
+  const response = await fetch(`${API_BASE_URL}/users/${userId}/bmi`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

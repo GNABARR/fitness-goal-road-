@@ -11,6 +11,8 @@ export type MeasuresPage = {
   totalElements: number;
   number: number;
   size: number;
+  first: boolean;
+  last: boolean;
 };
 
 const API_BASE_URL = "http://localhost:3000/api";

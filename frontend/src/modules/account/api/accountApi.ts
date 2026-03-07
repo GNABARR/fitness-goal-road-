@@ -11,7 +11,7 @@ export type UpdateAccountRequest = {
   password?: string;
 };
 
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = "/api";
 
 export async function getAccount(userId: number): Promise<AccountResponse> {
   const response = await fetch(`${API_BASE_URL}/account/${userId}`);

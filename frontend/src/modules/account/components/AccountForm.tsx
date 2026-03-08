@@ -46,7 +46,7 @@ export default function AccountForm({
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 rounded-2xl border-2 border-slate-300 bg-white px-5 py-4 text-xl font-semibold outline-none transition focus:border-slate-700"
+              className="flex-1 rounded-2xl border-2 border-slate-300 bg-white px-5 py-4 text-xl font-semibold text-black placeholder:text-gray-300 outline-none transition focus:border-blue-600"
               placeholder="email@example.com"
             />
           </div>
@@ -59,7 +59,7 @@ export default function AccountForm({
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="flex-1 rounded-2xl border-2 border-slate-300 bg-white px-5 py-4 text-xl font-semibold outline-none transition focus:border-slate-700"
+              className="flex-1 rounded-2xl border-2 border-slate-300 bg-white px-5 py-4 text-xl font-semibold text-black placeholder:text-gray-300 outline-none transition focus:border-blue-600"
               placeholder="Leave empty if unchanged"
             />
           </div>

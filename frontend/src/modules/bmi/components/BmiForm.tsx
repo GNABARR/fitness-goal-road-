@@ -57,7 +57,7 @@ export default function BmiForm({ onSubmit, loading }: BmiFormProps) {
                 step="0.1"
                 min="30"
                 max="300"
-                className="flex-1 rounded-2xl border-2 border-slate-300 bg-white px-5 py-4 text-xl font-semibold outline-none transition focus:border-blue-600"
+                className="flex-1 rounded-2xl border-2 border-slate-300 bg-white px-5 py-4 text-xl font-semibold text-black placeholder:text-gray-300 outline-none transition focus:border-blue-600"
               />
             </div>
           </div>
@@ -77,7 +77,7 @@ export default function BmiForm({ onSubmit, loading }: BmiFormProps) {
                 step="0.1"
                 min="100"
                 max="250"
-                className="flex-1 rounded-2xl border-2 border-slate-300 bg-white px-5 py-4 text-xl font-semibold outline-none transition focus:border-blue-600"
+                className="flex-1 rounded-2xl border-2 border-slate-300 bg-white px-5 py-4 text-xl font-semibold text-black placeholder:text-gray-300 outline-none transition focus:border-blue-600"
               />
             </div>
           </div>

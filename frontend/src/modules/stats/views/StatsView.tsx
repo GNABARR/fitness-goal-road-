@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import StatsTable from "../components/StatsTable";
 import { getUserMeasures, type MeasureSummary } from "../api/statsApi";
+import { getCurrentUserId } from "../../auth/api/authApi";
 
 export default function StatsView() {
-  const userId = 1;
+  const userId = getCurrentUserId();
 
   const [measures, setMeasures] = useState<MeasureSummary[]>([]);
   const [page, setPage] = useState(0);
@@ -12,6 +14,10 @@ export default function StatsView() {
   const [error, setError] = useState<string | null>(null);
 
   const loadMeasures = (targetPage: number) => {
+    if (!userId) {
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -28,8 +34,16 @@ export default function StatsView() {
   };
 
   useEffect(() => {
-    loadMeasures(0);
-  }, []);
+    if (userId) {
+      loadMeasures(0);
+    } else {
+      setLoading(false);
+    }
+  }, [userId]);
+
+  if (!userId) {
+    return <Navigate to="/login" replace />;
+  }
 
   if (loading) {
     return (

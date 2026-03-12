@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type AccountFormProps = {
   initialEmail: string;
@@ -13,6 +13,10 @@ export default function AccountForm({
 }: AccountFormProps) {
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    setEmail(initialEmail);
+  }, [initialEmail]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,6 +34,9 @@ export default function AccountForm({
     onSubmit(payload);
   };
 
+  const inputClassName =
+    "w-full rounded-2xl border-2 border-slate-300 bg-white px-5 py-4 text-lg font-medium text-slate-800 placeholder:text-slate-400 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-200";
+
   return (
     <div className="rounded-3xl border-4 border-slate-700 bg-white shadow-2xl">
       <div className="p-8 md:p-10">
@@ -38,28 +45,28 @@ export default function AccountForm({
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-8">
-            <label className="min-w-[200px] text-xl font-bold text-slate-800">
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-slate-700">
               Email
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 rounded-2xl border-2 border-slate-300 bg-white px-5 py-4 text-xl font-semibold text-black placeholder:text-gray-300 outline-none transition focus:border-blue-600"
+              className={inputClassName}
               placeholder="email@example.com"
             />
           </div>
 
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-8">
-            <label className="min-w-[200px] text-xl font-bold text-slate-800">
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-slate-700">
               New Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="flex-1 rounded-2xl border-2 border-slate-300 bg-white px-5 py-4 text-xl font-semibold text-black placeholder:text-gray-300 outline-none transition focus:border-blue-600"
+              className={inputClassName}
               placeholder="Leave empty if unchanged"
             />
           </div>
@@ -68,13 +75,9 @@ export default function AccountForm({
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-2xl bg-slate-800 px-6 py-4 text-xl font-black text-white shadow-xl transition-transform hover:scale-[1.02] hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-full items-center justify-center rounded-2xl bg-slate-800 px-6 py-4 text-lg font-semibold text-white shadow-xl transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {loading ? (
-                <div className="h-6 w-6 animate-spin rounded-full border-4 border-white border-t-transparent" />
-              ) : (
-                "Update Account"
-              )}
+              {loading ? "Updating..." : "Update Account"}
             </button>
           </div>
         </form>

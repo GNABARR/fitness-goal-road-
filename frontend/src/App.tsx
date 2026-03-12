@@ -8,6 +8,7 @@ import StatsView from "./modules/stats/views/StatsView";
 import LoginView from "./modules/auth/views/LoginView";
 import RegisterView from "./modules/auth/views/RegisterView";
 import { getCurrentUser, logout } from "./modules/auth/api/authApi";
+import AuthChoiceView from "./modules/auth/views/AuthChoiceView";
 
 function NavigationBar() {
   const navigate = useNavigate();
@@ -76,7 +77,7 @@ function NavigationBar() {
           </div>
         ) : (
           <Link
-            to="/login"
+            to="/auth"
             className="btn btn-ghost text-black text-2xl font-bold border-b-2 border-black rounded-none px-0 hover:bg-transparent"
           >
             Sign In
@@ -103,6 +104,7 @@ function App() {
           <Route path="/login" element={<LoginView />} />
           <Route path="/register" element={<RegisterView />} />
           <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/auth" element={<AuthChoiceView />} />
         </Routes>
       </div>
     </Router>

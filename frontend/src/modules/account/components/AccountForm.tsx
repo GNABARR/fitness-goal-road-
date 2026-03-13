@@ -23,7 +23,7 @@ export default function AccountForm({
 
     const payload: { email?: string; password?: string } = {};
 
-    if (email.trim() !== "") {
+    if (email.trim() !== "" && email.trim() !== initialEmail.trim()) {
       payload.email = email.trim();
     }
 

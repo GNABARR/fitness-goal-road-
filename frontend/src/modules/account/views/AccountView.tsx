@@ -29,6 +29,11 @@ export default function AccountView() {
     if (!userId) {
       return;
     }
+    if (!data.email && !data.password) {
+      setError("null");
+      setSuccessMessage("pas de changement à faire");
+      return;
+    }
 
     try {
       setLoading(true);

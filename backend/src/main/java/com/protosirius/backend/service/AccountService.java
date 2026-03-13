@@ -1,5 +1,6 @@
 package com.protosirius.backend.service;
 
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,24 +28,43 @@ public class AccountService {
                 User user = userRepository.findById(userId)
                                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé , esseye de t'inscrie"));
 
-                if (newEmail != null && !newEmail.isEmpty()) {
-                        if (!newEmail.matches(EMAIL_REGEX)) {
+                boolean haschanges=false;
+
+                if (newEmail != null && !newEmail.isBlank()) {
+                        String email= newEmail.trim();
+                        
+                        if (!email.matches(EMAIL_REGEX)) {
                                 throw new IllegalArgumentException("format d'Email non valide I-I");
                         }
-                        if (userRepository.existsByEmail(newEmail)) {
+
+                        User Userexistant = userRepository.findByEmail(email);
+                        if (Userexistant != null && Userexistant.getId() != user.getId()) {
                                 throw new IllegalArgumentException("Email déjà utilisé par un autre compte");
                         }
-                        user.setEmail(newEmail);
+                        
+                        if (!email.equals(user.getEmail())) {
+                                user.setEmail(email);
+                                haschanges=true;
+                        }
                 }
 
-                if (newPassword != null && !newPassword.isEmpty()) {
-                        user.setMotDePasse(newPassword);
-                }
-                else{
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Mot de passe obligatoire");
+                if (newPassword != null && !newPassword.isBlank()) {
+                        String password = newPassword.trim();
+                
+                if (password.length() < 4) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Le mot de passe doit contenir au moins 4 caractères");
                 }
 
-                return userRepository.save(user);
+                user.setMotDePasse(password);
+                haschanges=true;
+                
+        }
+                if(!haschanges){
+                        return user;
+                }
+
+                return userRepository.save(user); 
+        
         }
 
 

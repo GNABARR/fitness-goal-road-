@@ -1,78 +1,98 @@
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link, Navigate, useNavigate } from "react-router-dom";
 import HomePage from "./modules/Macronutritions/views/HomePage";
 import DietPage from "./modules/Macronutritions/views/DietPage";
 import MicroPage from "./modules/micronutritions/views/MicroPage";
 import AccountView from "./modules/account/views/AccountView";
 import BmiView from "./modules/bmi/views/BmiView";
 import StatsView from "./modules/stats/views/StatsView";
+import LoginView from "./modules/auth/views/LoginView";
+import RegisterView from "./modules/auth/views/RegisterView";
+import { getCurrentUser, logout } from "./modules/auth/api/authApi";
+import AuthChoiceView from "./modules/auth/views/AuthChoiceView";
+
+function NavigationBar() {
+  const navigate = useNavigate();
+  const currentUser = getCurrentUser();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  return (
+    <div className="navbar bg-gradient-to-r from-indigo-800 via-purple-800 to-pink-700 shadow-md px-6">
+      <div className="flex-1">
+        <Link
+          to="/"
+          className="text-4xl font-extrabold tracking-wide text-gray-300 hover:text-white transition"
+        >
+          FITNESS GOAL ROAD
+        </Link>
+
+        <ul className="menu menu-horizontal px-6 gap-4">
+          <li>
+            <Link to="/diet" className="text-xl font-bold text-gray-400 hover:text-white transition">
+              Diet Goal Road
+            </Link>
+          </li>
+
+          <li>
+            <Link to="/micro" className="text-xl font-bold text-gray-400 hover:text-white transition">
+              Micro Goal Road
+            </Link>
+          </li>
+
+          <li>
+            <Link to="/account" className="text-xl font-bold text-gray-400 hover:text-white transition">
+              Account
+            </Link>
+          </li>
+
+          <li>
+            <Link to="/bmi" className="text-xl font-bold text-gray-400 hover:text-white transition">
+              BMI
+            </Link>
+          </li>
+
+          <li>
+            <Link to="/stats" className="text-xl font-bold text-gray-400 hover:text-white transition">
+              Stats
+            </Link>
+          </li>
+        </ul>
+      </div>
+
+      <div className="flex-none">
+        {currentUser ? (
+          <div className="flex items-center gap-4">
+            <span className="text-lg font-bold text-white">
+              {currentUser.prenom}
+            </span>
+            <button
+              onClick={handleLogout}
+              className="btn btn-ghost text-black text-xl font-bold border-b-2 border-black rounded-none px-0 hover:bg-transparent"
+            >
+              Logout
+            </button>
+          </div>
+        ) : (
+          <Link
+            to="/auth"
+            className="btn btn-ghost text-black text-2xl font-bold border-b-2 border-black rounded-none px-0 hover:bg-transparent"
+          >
+            Sign In
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-700">
-        <div className="navbar bg-gradient-to-r from-indigo-800 via-purple-800 to-pink-700 shadow-md px-6">
-          <div className="flex-1">
-            <Link
-              to="/"
-              className="text-4xl font-extrabold tracking-wide text-gray-300 hover:text-white transition"
-            >
-              FITNESS GOAL ROAD
-            </Link>
-
-            <ul className="menu menu-horizontal px-6 gap-4">
-              <li>
-                <Link
-                  to="/diet"
-                  className="text-xl font-bold text-gray-400 hover:text-white transition"
-                >
-                  Diet Goal Road
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  to="/micro"
-                  className="text-xl font-bold text-gray-400 hover:text-white transition"
-                >
-                  Micro Goal Road
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  to="/account"
-                  className="text-xl font-bold text-gray-400 hover:text-white transition"
-                >
-                  Account
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  to="/bmi"
-                  className="text-xl font-bold text-gray-400 hover:text-white transition"
-                >
-                  BMI
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  to="/stats"
-                  className="text-xl font-bold text-gray-400 hover:text-white transition"
-                >
-                  Stats
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="flex-none">
-            <button className="btn btn-ghost text-black text-2xl font-bold border-b-2 border-black rounded-none px-0 hover:bg-transparent">
-              Sign In
-            </button>
-          </div>
-        </div>
+        <NavigationBar />
 
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -81,7 +101,10 @@ function App() {
           <Route path="/account" element={<AccountView />} />
           <Route path="/bmi" element={<BmiView />} />
           <Route path="/stats" element={<StatsView />} />
+          <Route path="/login" element={<LoginView />} />
+          <Route path="/register" element={<RegisterView />} />
           <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/auth" element={<AuthChoiceView />} />
         </Routes>
       </div>
     </Router>

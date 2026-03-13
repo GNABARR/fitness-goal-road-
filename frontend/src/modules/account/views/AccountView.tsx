@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import AccountForm from "../components/AccountForm";
 import { getAccount, updateAccount, type AccountResponse } from "../api/accountApi";
+import { getCurrentUserId } from "../../auth/api/authApi";
 
 export default function AccountView() {
-  const userId = 1;
+  const userId = getCurrentUserId();
 
   const [account, setAccount] = useState<AccountResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -12,13 +14,27 @@ export default function AccountView() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!userId) {
+      setPageLoading(false);
+      return;
+    }
+
     getAccount(userId)
       .then((data) => setAccount(data))
       .catch((err) => setError(err instanceof Error ? err.message : "Unexpected error"))
       .finally(() => setPageLoading(false));
-  }, []);
+  }, [userId]);
 
   const handleSubmit = async (data: { email?: string; password?: string }) => {
+    if (!userId) {
+      return;
+    }
+    if (!data.email && !data.password) {
+      setError("null");
+      setSuccessMessage("pas de changement à faire");
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -33,6 +49,10 @@ export default function AccountView() {
       setLoading(false);
     }
   };
+
+  if (!userId) {
+    return <Navigate to="/login" replace />;
+  }
 
   if (pageLoading) {
     return (

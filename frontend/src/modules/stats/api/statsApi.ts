@@ -2,6 +2,7 @@ export type MeasureSummary = {
   id: number;
   poidsKg: number;
   bmi: number;
+  categorie: string;
   date: string;
 };
 

@@ -1,14 +1,20 @@
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 import BmiForm from "../components/BmiForm.tsx";
 import BmiResultCard from "../components/BmiResultCard";
 import { calculateBmiForUser, type BmiResponse } from "../api/bmiApi";
+import { getCurrentUserId } from "../../auth/api/authApi";
 
 export default function BmiView() {
-  const userId = 1;
+  const userId = getCurrentUserId();
 
   const [result, setResult] = useState<BmiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  if (!userId) {
+    return <Navigate to="/login" replace />;
+  }
 
   const handleSubmit = async (data: { poidsKg: number; tailleCm: number }) => {
     try {

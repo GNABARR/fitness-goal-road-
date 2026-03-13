@@ -10,6 +10,7 @@ public class MeasureSummaryResponse {
     private double poidsKg;
     private Instant date;
     private double bmi;
+    private String categorie;
 
     public static MeasureSummaryResponse fromMeasure(Measure m) {
         MeasureSummaryResponse response = new MeasureSummaryResponse();
@@ -17,6 +18,7 @@ public class MeasureSummaryResponse {
         response.poidsKg = m.getPoidsKg();
         response.date = m.getDate();
         response.bmi = m.getBmi();
+        response.categorie = m.getCategorie();
         return response;
     }
 
@@ -31,6 +33,9 @@ public class MeasureSummaryResponse {
     }   
     public double getBmi() {
         return bmi;
+    }
+    public String getCategorie() {
+        return categorie;
     }
     
 }

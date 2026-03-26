@@ -238,6 +238,15 @@ export default function RecommendationView() {
           >
             {loading ? 'Loading...' : 'Recommander la prochaine séance'}
           </button>
+          <button
+  className="bg-purple-600 text-white px-4 py-2 rounded disabled:opacity-50"
+  onClick={function () {
+    setShowCustomForm(!showCustomForm)
+  }}
+  disabled={loading || athleteId == null}
+>
+  personnalised recommendation
+</button>
         </div>
 
         {error ? <div className="text-red-600">{error}</div> : null}

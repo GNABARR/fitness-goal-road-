@@ -250,6 +250,61 @@ export default function RecommendationView() {
         </div>
 
         {error ? <div className="text-red-600">{error}</div> : null}
+        {showCustomForm ? (
+
+  <div className="border rounded p-4 space-y-3 bg-gray-50">
+    <div className="font-semibold">new recommendation</div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <input
+        className="border rounded p-2"
+
+        placeholder="Objectif"
+        value={customGoal}
+        onChange={function (e) {
+          setCustomGoal(e.target.value)
+        }}
+      />
+
+      <input
+        className="border rounded p-2"
+        placeholder="Niveau"
+         
+        value={customLevel}
+        onChange={function (e) {
+          setCustomLevel(e.target.value)
+        }}
+      />
+
+      <input
+        className="border rounded p-2"
+        placeholder="Equipement"
+        value={customEquipment}
+        onChange={function (e) {
+          
+          setCustomEquipment(e.target.value)
+        }}
+      />
+
+      <input
+        className="border rounded p-2"
+        placeholder="Minutes disponibles"
+        value={customAvailableMinutes}
+        onChange={function (e) {
+          setCustomAvailableMinutes(e.target.value)
+        }}
+      />
+    </div>
+
+    <button
+      className="bg-purple-600 text-white px-4 py-2 rounded disabled:opacity-50"
+      onClick={onCustomRecommend}
+      disabled={loading || athleteId == null}
+    >
+      {loading ? 'Loading...' : 'Generer'}
+    </button>
+  </div>
+) : null}
       </div>
 
       {athleteCard}

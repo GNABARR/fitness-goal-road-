@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import {
   getAthlete,
-
   getAthleteSessions,
   getSessionExercises,
 
   getNextRecommendation,
+  getCustomRecommendation,
 } from '../api/recommendationApi.js'
 
 export default function RecommendationView() {
@@ -22,6 +22,13 @@ export default function RecommendationView() {
   const [selectedSessionId, setSelectedSessionId] = useState(null)
   const [sessionExercises, setSessionExercises] = useState([])
   const [rec, setRec] = useState(null)
+  const [showCustomForm, setShowCustomForm] = useState(false)
+  const [customGoal, setCustomGoal] = useState('')
+  const [customLevel, setCustomLevel] = useState('')
+  
+  const [customEquipment, setCustomEquipment] = useState('')
+  
+  const [customAvailableMinutes, setCustomAvailableMinutes] = useState('')
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -114,6 +121,31 @@ export default function RecommendationView() {
 
     setLoading(false)
   }
+  async function onCustomRecommend() {
+  if (athleteId == null) return
+
+  setLoading(true)
+  setError('')
+
+  try {
+    var r = await getCustomRecommendation({
+      athleteId: athleteId,
+      goal: customGoal,
+      level: customLevel,
+      equipment: customEquipment,
+      availableMinutes: customAvailableMinutes
+        ? Number(customAvailableMinutes)
+        : null,
+    })
+
+    setRec(r)
+    setShowCustomForm(false)
+  } catch (e) {
+    setError('impossible de recommander')
+  }
+
+  setLoading(false)
+}
 
   var athleteCard = null
   if (athlete) {

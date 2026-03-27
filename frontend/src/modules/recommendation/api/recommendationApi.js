@@ -21,3 +21,15 @@ export async function getNextRecommendation(athleteId) {
   if (!res.ok) throw new Error('Failed')
   return res.json()
 }
+export async function getCustomRecommendation(payload) {
+  const res = await fetch(`/api/recommendations/custom`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!res.ok) throw new Error('Failed')
+  return res.json()
+}

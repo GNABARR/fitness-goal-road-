@@ -148,23 +148,20 @@ export default function RecommendationView() {
 }
 
   var athleteCard = null
-  if (athlete) {
-    athleteCard = (
-      <div className="bg-white p-4 rounded shadow space-y-1">
-
-        <div className="font-semibold">Athlete</div>
-        <div>Id: {athlete.id}</div>
-
-        <div>Nom: {athleteName(athlete)}</div>
-
-        <div>Poids: {athlete.weightKg} kg</div>
-        
-        <div>objectif: {athlete.goal}</div>
-        <div>niveau: {athlete.level}</div>
-        
-      </div>
-    )
-  }
+if (athlete) {
+  athleteCard = (
+    <div className="bg-white p-4 rounded shadow space-y-1">
+      <div className="font-semibold">Athlete</div>
+      <div>Id: {athlete.id}</div>
+      <div>Nom: {athleteName(athlete)}</div>
+      <div>Poids: {athlete.weightKg} kg</div>
+      <div>objectif: {athlete.goal}</div>
+      <div>niveau: {athlete.level}</div>
+      <div>temps dispo: {athlete.availableMinutes} min</div>
+      <div>equipement: {athlete.equipment}</div>
+    </div>
+  )
+}
 
   var recCard = null
   if (rec) {
@@ -186,8 +183,15 @@ export default function RecommendationView() {
           <ul className="list-disc ml-5">
 
             {exs.map(function (e) {
-              return <li key={e.id}>{e.name}</li>
-            })}
+  return (
+    <li key={e.id}>
+      {e.name}
+      {e.muscleGroup ? ' - ' + e.muscleGroup : ''}
+      {e.difficulty ? ' - ' + e.difficulty : ''}
+      {e.score != null ? ' - score ' + e.score : ''}
+    </li>
+  )
+})}
           </ul>
 
         </div>
@@ -281,7 +285,7 @@ export default function RecommendationView() {
         placeholder="Equipement"
         value={customEquipment}
         onChange={function (e) {
-          
+
           setCustomEquipment(e.target.value)
         }}
       />

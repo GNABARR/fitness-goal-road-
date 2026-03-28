@@ -1,5 +1,6 @@
 package com.protosirius.backend.service;
 
+import com.protosirius.backend.dto.RecommendationRequest;
 import com.protosirius.backend.entity.Athlete;
 import com.protosirius.backend.entity.Exercise;
 import com.protosirius.backend.entity.SessionExercise;
@@ -170,5 +171,11 @@ public class RecommendationService {
 
     private String safe(String s) {
         return s == null ? "UNKNOWN" : s;
+    }
+
+
+    public Map<String, Object> recommendWithFilters(RecommendationRequest request) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'recommendWithFilters'");
     }
 }

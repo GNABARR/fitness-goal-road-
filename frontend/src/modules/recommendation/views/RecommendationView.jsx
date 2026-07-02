@@ -150,7 +150,7 @@ export default function RecommendationView() {
   var athleteCard = null
 if (athlete) {
   athleteCard = (
-    <div className="bg-white p-4 rounded shadow space-y-1">
+    <div className="bg-white text-black p-4 rounded shadow space-y-1">
       <div className="font-semibold">Athlete</div>
       <div>Id: {athlete.id}</div>
       <div>Nom: {athleteName(athlete)}</div>
@@ -314,7 +314,7 @@ if (athlete) {
       {athleteCard}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white p-4 rounded shadow">
+          <div className="bg-white text-black p-4 rounded shadow">
 
           <div className="font-semibold mb-2">historique des seances</div>
 
@@ -355,7 +355,7 @@ if (athlete) {
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded shadow">
+        <div className="bg-white text-black p-4 rounded shadow">
           <div className="font-semibold mb-2">Exercices de la seance</div>
 
           {selectedSessionId == null ? <div>Cliquer sur une seance</div> : null}

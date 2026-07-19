@@ -71,7 +71,11 @@ export default function CaloriesView() {
 
       const data = await response.json()
 
+      
+
       setAthlete(data)
+
+      localStorage.setItem('selectedAthleteId', String(data.id)) // memorisation 
     } catch {
       setAthlete(null)
       setError('Athlete introuvable')

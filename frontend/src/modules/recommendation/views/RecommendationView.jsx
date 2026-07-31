@@ -276,65 +276,55 @@ export default function RecommendationView() {
 
           {showCustomForm && (
 
-            <div className="border rounded p-4 bg-gray-50 space-y-4">
 
-              <h3 className="font-semibold">
-                Change criteria
-              </h3>
+  <div className="border rounded p-4 bg-gray-50 space-y-4">
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
-                <input
-                  className="border rounded p-2"
-                  placeholder="Goal"
-                  value={customGoal}
-                  onChange={(e) =>
-                    setCustomGoal(e.target.value)
-                  }
-                />
+    <h3 className="font-semibold text-lg">Custom recommendation</h3>
 
-                <input
-                  className="border rounded p-2"
-                  placeholder="Level"
-                  value={customLevel}
-                  onChange={(e) =>
-                    setCustomLevel(e.target.value)
-                  }
-                />
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                <input
-                  className="border rounded p-2"
-                  placeholder="Equipment"
-                  value={customEquipment}
-                  onChange={(e) =>
-                    setCustomEquipment(e.target.value)
-                  }
-                />
+      <select value={customGoal} onChange={(e) => setCustomGoal(e.target.value)} className="border rounded p-2 text-black">
+        <option value="">-- Select goal --</option>
+        <option value="ENDURANCE">Endurance</option>
+        <option value="STRENGTH">Strength</option>
+        <option value="MUSCLE_GAIN">Muscle gain</option>
+        <option value="WEIGHT_LOSS">Weight loss</option>
+      </select>
 
-                <input
-                  type="number"
-                  className="border rounded p-2"
-                  placeholder="Available minutes"
-                  value={customAvailableMinutes}
-                  onChange={(e) =>
-                    setCustomAvailableMinutes(
-                      e.target.value
-                    )
-                  }
-                />
+      <select value={customLevel} onChange={(e) => setCustomLevel(e.target.value)} className="border rounded p-2 text-black">
+        <option value="">-- Select level --</option>
+        <option value="BEGINNER">Beginner</option>
+        <option value="INTERMEDIATE">Intermediate</option>
+        <option value="ADVANCED">Advanced</option>
+      </select>
 
-              </div>
+      <select value={customEquipment} onChange={(e) => setCustomEquipment(e.target.value)} className="border rounded p-2 text-black">
+        <option value="">-- Select equipment --</option>
+        <option value="HOME">Home</option>
+        <option value="DUMBBELLS">Dumbbells</option>
+        <option value="GYM">Gym</option>
+      </select>
 
-              <button
-                className="bg-purple-600 text-white px-4 py-2 rounded"
-                onClick={CustomRecommend}
-                disabled={loading}
-              >
-                Generate
-              </button>
+      <select value={customAvailableMinutes} onChange={(e) => setCustomAvailableMinutes(e.target.value)} className="border rounded p-2 text-black">
+        <option value="">-- Select duration --</option>
+        <option value="15">15 minutes</option>
+        <option value="30">30 minutes</option>
+        <option value="45">45 minutes</option>
+        <option value="60">60 minutes</option>
+        <option value="90">90 minutes</option>
+      </select>
+    </div>
 
-            </div>
-          )}
+    <button
+      onClick={CustomRecommend}
+      disabled={loading || !customGoal || !customLevel || !customEquipment || !customAvailableMinutes}
+      className="bg-purple-600 text-white px-5 py-2 rounded disabled:opacity-50"
+    >
+      {loading ? 'Generating...' : 'Generate recommendation'}
+    </button>
+  </div>
+)}
 
         </div>
       )}

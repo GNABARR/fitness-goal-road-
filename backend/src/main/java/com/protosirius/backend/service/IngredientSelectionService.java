@@ -12,6 +12,9 @@ import com.protosirius.backend.repository.IngredientRepository;
 @Service
 public class IngredientSelectionService {
 
+    private static final double SEUIL_CROISE = 10.0;
+
+
     private final IngredientRepository ingredientRepository;
 
     public IngredientSelectionService(IngredientRepository ingredientRepository) {
@@ -23,7 +26,8 @@ public class IngredientSelectionService {
 
 
 
-    public List<IngredientQuantite> creerCollectionProteines(double proteinesCibleGrammes) {List<Ingredient> ingredients = ingredientRepository.findTop3ByOrderByProteinsPer100gDesc();
+    public List<IngredientQuantite> creerCollectionProteines(double proteinesCibleGrammes) {List<Ingredient> ingredients = ingredientRepository.findTop3ByCarbsPer100gLessThanOrderByProteinsPer100gDesc(SEUIL_CROISE);
+
         List<IngredientQuantite> collection = new ArrayList<>();
         double cibleParIngredient = proteinesCibleGrammes / ingredients.size();
 
@@ -39,7 +43,8 @@ public class IngredientSelectionService {
 
 
 
-    public List<IngredientQuantite> creerCollectionGlucides(double glucidesCiblesGrammes) {List<Ingredient> ingredients = ingredientRepository.findTop3ByOrderByCarbsPer100gDesc();
+    public List<IngredientQuantite> creerCollectionGlucides(double glucidesCiblesGrammes) {List<Ingredient> ingredients = ingredientRepository.findTop3ByProteinsPer100gLessThanOrderByCarbsPer100gDesc(SEUIL_CROISE);
+
         List<IngredientQuantite> collection = new ArrayList<>();
         double cibleParIngredient = glucidesCiblesGrammes / ingredients.size();
 

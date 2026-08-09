@@ -1,4 +1,4 @@
-const ResultDisplay = ({ result, onAdjust, onGoToMicro }) => {
+const ResultDisplay = ({ result, onAdjust, onGoToMicro, onGoToIngredients }) => {
     return (
         <div className="card bg-gradient-to-br from-base-100 to-base-200 shadow-2xl border-4 border-secondary">
             <div className="card-body">
@@ -59,14 +59,17 @@ const ResultDisplay = ({ result, onAdjust, onGoToMicro }) => {
                     <button onClick={onAdjust} className="btn btn-secondary btn-lg w-full text-xl font-black shadow-xl hover:scale-105 transition-transform">
                         Adjust My Plan
                     </button>
-                    {onGoToMicro && (
+                    {onGoToIngredients && (
                         <button
-                            onClick={onGoToMicro}
+                            onClick={onGoToIngredients}
+                            
                             className="btn btn-lg w-full text-xl font-black shadow-xl hover:scale-105 transition-transform"
-                            style={{ backgroundColor: '#a855f7', color: 'white', borderColor: '#a855f7' }}>
-                            Calculate My Micronutrients →
+
+                            style={{ backgroundColor: '#10b981', color: 'white', borderColor: '#10b981' }}>
+                            See My Ingredients →
                         </button>
                     )}
+
                 </div>
             </div>
         </div>

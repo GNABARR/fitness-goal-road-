@@ -36,6 +36,10 @@ const DietPage = () => {
         navigate('/micro', { state: { profileData: userData } });
     };
 
+    const handleGoToIngredients = () => {
+        navigate('/ingredients', { state: { macros: resultatCalc.macronutrients } });
+    };
+
     const handleAdjustmentSubmit = async (data) => {
         setLoading(true);
         try {
@@ -91,6 +95,7 @@ const DietPage = () => {
                         result={resultatCalc}
                         onAdjust={handleAjuster}
                         onGoToMicro={handleGoToMicro}
+                        onGoToIngredients={handleGoToIngredients}
                     />
                 )}
 

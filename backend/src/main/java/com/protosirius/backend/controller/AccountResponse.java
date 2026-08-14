@@ -1,5 +1,7 @@
 package com.protosirius.backend.controller;
 
+import java.util.Calendar;
+
 import com.protosirius.backend.entity.User;
 
 public class AccountResponse {
@@ -8,6 +10,10 @@ public class AccountResponse {
     private String message;
     private String nom;
     private String prenom;
+    private double poids;
+    private double taille;
+    private String sex;
+    private Integer anneeNaissance;
 
     public static AccountResponse fromUser(User user) {
         AccountResponse response = new AccountResponse();
@@ -16,8 +22,24 @@ public class AccountResponse {
         response.nom=user.getNom();
         response.prenom=user.getPrenom();
         response.message="Infos du compte mises à jour";
-        return response;
-    }
+        response.poids=user.getPoids();
+        response.taille=user.getTaille();
+        response.sex = user.getSex() != null ? user.getSex().name() : null;
+
+        if (user.getDateNaissance() != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(user.getDateNaissance());
+            response.anneeNaissance = calendar.get(Calendar.YEAR);
+        }
+        return response;}
+
+
+
+
+
+
+
+        
 
     public int getId() {
         return id;
@@ -33,5 +55,18 @@ public class AccountResponse {
     }
     public String getPrenom() {
         return prenom;
+    }
+
+    public double getPoids() {
+        return poids;
+    }
+    public double getTaille() {
+        return taille;
+    }
+    public String getSex() {
+        return sex;
+    }
+    public Integer getAnneeNaissance() {
+        return anneeNaissance;
     }
 }

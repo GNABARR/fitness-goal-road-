@@ -1,38 +1,47 @@
 import { useEffect, useState } from "react";
 import AccountForm from "../components/AccountForm";
-import { getAccount, updateAccount, type AccountResponse } from "../api/accountApi";
+import { getAccount, updateAccount, getNutritionHistory, type AccountResponse, type NutritionHistoryEntry } from "../api/accountApi";
 
 export default function AccountView() {
   const userId = 1;
 
+
+
   const [account, setAccount] = useState<AccountResponse | null>(null);
+  const [history, setHistory] = useState<NutritionHistoryEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null); const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+
+
+
 
   useEffect(() => {
     getAccount(userId)
       .then((data) => setAccount(data))
       .catch((err) => setError(err instanceof Error ? err.message : "Unexpected error"))
       .finally(() => setPageLoading(false));
+    getNutritionHistory(userId).then((data) => setHistory(data)).catch(() => {});
   }, []);
+
+
+
+
 
   const handleSubmit = async (data: { email?: string; password?: string }) => {
     try {
-      setLoading(true);
-      setError(null);
-      setSuccessMessage(null);
-
+      setLoading(true); setError(null); setSuccessMessage(null);
       const updated = await updateAccount(userId, data);
-      setAccount(updated);
-      setSuccessMessage(updated.message);
+      setAccount(updated); setSuccessMessage(updated.message);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unexpected error");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
+
+
+
+  
 
   if (pageLoading) {
     return (
@@ -41,6 +50,9 @@ export default function AccountView() {
       </div>
     );
   }
+
+
+
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 py-8">
@@ -71,23 +83,47 @@ export default function AccountView() {
         </div>
       )}
 
+
+
       {error && (
         <div className="rounded-2xl border-2 border-red-300 bg-red-50 px-5 py-4 text-lg font-semibold text-red-700 shadow">
           {error}
-        </div>
-      )}
+        </div>)}
+
+
+
 
       {successMessage && (
         <div className="rounded-2xl border-2 border-green-300 bg-green-50 px-5 py-4 text-lg font-semibold text-green-700 shadow">
           {successMessage}
-        </div>
-      )}
+        </div>)}
+
+
+
 
       <AccountForm
         initialEmail={account?.email ?? ""}
         loading={loading}
         onSubmit={handleSubmit}
       />
+
+
+
+
+      {history.length > 0 && (
+        <div className="rounded-3xl border-4 border-blue-600 bg-gradient-to-br from-white to-slate-100 shadow-2xl">
+          <div className="p-8 md:p-10">
+            <h2 className="mb-6 text-3xl font-black text-blue-600">Nutrition History</h2>
+            <div className="space-y-3">
+              {history.map((entry) => (
+                <div key={entry.id} className="rounded-2xl bg-white p-4 shadow-sm">
+                  <p className="text-sm font-semibold text-slate-500">{new Date(entry.date).toLocaleString()}</p>
+                  <p className="mt-1 text-lg font-black text-slate-900">{entry.calories} kcal - P {entry.proteines}g - G {entry.glucides}g - L {entry.lipides}g</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  );
-}
+);}

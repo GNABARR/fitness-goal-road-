@@ -216,9 +216,7 @@ export default function CaloriesView() {
   return (
     <div className="space-y-6">
 
-      <h1 className="text-2xl font-semibold text-black">
-        Calories brûlées
-      </h1>
+      
 
       {message !== '' && (
         <div className="bg-green-100 border p-4 rounded text-black">

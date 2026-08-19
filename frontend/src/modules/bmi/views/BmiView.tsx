@@ -2,9 +2,11 @@ import { useState } from "react";
 import BmiForm from "../components/BmiForm.tsx";
 import BmiResultCard from "../components/BmiResultCard";
 import { calculateBmiForUser, type BmiResponse } from "../api/bmiApi";
+import { useAuth } from "../../auth/context/AuthContext";
 
 export default function BmiView() {
-  const userId = 1;
+  const { user } = useAuth();
+  const userId = user?.id ?? 1;
 
   const [result, setResult] = useState<BmiResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -24,6 +26,9 @@ export default function BmiView() {
     }
   };
 
+
+
+  
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 py-8">
       <BmiForm onSubmit={handleSubmit} loading={loading} />

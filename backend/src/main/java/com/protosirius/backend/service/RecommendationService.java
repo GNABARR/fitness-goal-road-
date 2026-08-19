@@ -28,11 +28,7 @@ public class RecommendationService {
 
     private final ExerciseRep exerciseRepository;
 
-    public RecommendationService(AthleteRep athleteRepository, TrainingSessionRep trainingSessionRepository,
-
-                                 SessionExerciseRep sessionExerciseRepository,
-
-                                 ExerciseRep exerciseRepository) {
+    public RecommendationService(AthleteRep athleteRepository, TrainingSessionRep trainingSessionRepository, SessionExerciseRep sessionExerciseRepository, ExerciseRep exerciseRepository) {
 
 
         this.athleteRepository =athleteRepository;
@@ -48,100 +44,308 @@ public class RecommendationService {
     // my algo : recommander la prochaine seance
 
 
-    public Map<String, Object> recommendNext(Long athleteId) {      //
-        Athlete athlete = athleteRepository.findById(athleteId).orElseThrow();
+    public Map<String, Object> recommendNext(Long athleteId) {
 
+    //athlete
+    Athlete athlete = athleteRepository.findById(athleteId).orElseThrow(() -> new IllegalArgumentException("Athlète introuvable")
+            );
 
-        List<TrainingSession> last = trainingSessionRepository.findTop3ByAthleteIdOrderBySessionDateDesc(athleteId);  
+    //3 dernière séances
+    List<TrainingSession> lastSessions =
+            trainingSessionRepository.findTop3ByAthleteIdOrderBySessionDateDesc(athleteId);
 
-        // 3 seance
+    // Compteur pr grp musculaire
+    Map<String, Integer> muscleCounts =
+            new LinkedHashMap<>();
 
-        Map<String, Integer> counts = new HashMap<>(); 
+    muscleCounts.put("CHEST", 0);
+    muscleCounts.put("BACK", 0);
+    muscleCounts.put("LEGS", 0);
+    muscleCounts.put("SHOULDERS", 0);
+    muscleCounts.put("ARMS", 0);
+    muscleCounts.put("CORE", 0);
 
+    // recent ex
+    Set<Long> recentExerciseIds = new HashSet<>();
 
-        String lastIntensity = null;
+    String lastIntensity = null;
 
+    // historique
+    for (int i = 0; i < lastSessions.size(); i++) {
 
-        for ( int i = 0;i < last.size();  i++ ) {
+        TrainingSession session = lastSessions.get(i);
 
-            TrainingSession s = last.get(i);
+        if (i == 0) {
+            lastIntensity =pickSessionIntensity(session);
+        }
 
+        List<SessionExercise> sessionExercises = sessionExerciseRepository.findBySessionId(
+                                session.getId()
+                        );
 
-            if (i == 0) lastIntensity =pickSessionIntensity(s);
+        for (SessionExercise sessionExercise : sessionExercises) {
 
+            Exercise exercise =   sessionExercise.getExercise();
 
-            List<SessionExercise> ses = sessionExerciseRepository.findBySessionId(s.getId());
+            if (exercise == null) {
+                continue;
+            }
 
+            recentExerciseIds.add( exercise.getId()
+            );
 
-            for ( SessionExercise se : ses  ) {
-                String mg = se.getExercise().getMuscleGroup().getName(); // nom de muscle group
+            if (exercise.getMuscleGroup() == null) {
+                continue;
+            }
 
+            String muscle = exercise.getMuscleGroup().getName().toUpperCase();
 
-                counts.put( mg, counts.getOrDefault(mg, 0 ) + 1);
+            if (muscleCounts.containsKey(muscle)) {
+
+                muscleCounts.put(muscle, muscleCounts.get(muscle) + 1);
+            }
+        }
+    }
+
+    // muscle cible
+    String targetMuscle;
+
+    // aucun historique ------------------ full body
+    
+    if (lastSessions.isEmpty()) { targetMuscle = "FULL_BODY";
+
+    } else {
+
+        targetMuscle = null;
+
+        int minimum = Integer.MAX_VALUE;
+
+        for (Map.Entry<String, Integer> entry : muscleCounts.entrySet()) {
+
+            if (entry.getValue() < minimum) {
+
+                minimum =entry.getValue();
+
+                targetMuscle = entry.getKey();
             }
         }
 
-        String target = pickLeast(counts);  // mon methode pickleast
+        if (targetMuscle == null) {
+            targetMuscle ="FULL_BODY";
+        }
+    }
 
+    
+    List<Exercise> candidates = exerciseRepository .findByMuscleGroupNameIgnoreCase( targetMuscle);
 
-        List<Exercise > candidates = exerciseRepository.findByMuscleGroupNameIgnoreCase(target);
-        Collections.shuffle(candidates);
+    // securite
+    if (candidates.isEmpty()) {
 
-        // prendre les 3 1er exo
+        candidates =exerciseRepository.findAll();
+    }
 
+    //athelete
+    String goal = athlete.getGoal();
 
-        List< Exercise > picked = candidates.size() > 3 ? candidates.subList(0, 3) : candidates;
+    String level =athlete.getLevel();
 
-        String intensity = "MEDIUM";
+    String equipment =athlete.getEquipment();
 
-        if ( lastIntensity == null ) intensity = "MEDIUM";
+    int availableMinutes =athlete.getAvailableMinutes()== null
+                    ? 30
+                    : athlete.getAvailableMinutes();
 
-        else if ("HIGH".equalsIgnoreCase(lastIntensity  ) ) intensity = "MEDIUM";
-        else intensity = "HIGH";
+    // score
+    
+    List<Map<String, Object>> scored = new ArrayList<>();
 
-        int duration = athlete.getAvailableMinutes() == null ? 30 : athlete.getAvailableMinutes();
+    for (Exercise exercise : candidates) {
 
-        List<  Map<String, Object>> ex=new ArrayList<>();
+        int score = 0;
 
+        
+        if (exercise.getMuscleGroup()
+                != null
+                && exercise.getMuscleGroup().getName()
+                .equalsIgnoreCase(
+                        targetMuscle
+                )) {
 
-        for (Exercise e : picked) {
-            Map<String, Object> m = new HashMap<>();
-            m.put("id", e.getId());
-
-            m.put("name", e.getName());
-            m.put("muscleGroup", e.getMuscleGroup().getName());
-            m.put("difficulty", e.getDifficulty());
-
-
-            ex.add(m);
+            score += 5;
         }
 
-        List<String> reasons = new ArrayList<>();   // le reason du choix
-
-
-        reasons.add("goal=" + safe(athlete.getGoal()) );
-        reasons.add("targetMuscle=" + target   );
-        reasons.add("intensity=" + intensity  );
-
-        Map<String, Object> res = new HashMap<>();
-        res.put("athleteId", athlete.getId());
-
-        res.put("athleteName", athlete.getFullName());
-        res.put("goal", athlete.getGoal());
         
-        res.put("level", athlete.getLevel());
-        res.put("weightKg", athlete.getWeightKg());
-        res.put("availableMinutes", duration);
-        res.put("focusMuscleGr", target);
+        if (matchesGoal(exercise,goal
+        )) {
+            score += 4;
+        }
 
-        res.put("focusMuscleGroup", target);
         
-        res.put("intensity", intensity);
-        res.put("exercises", ex);
+        if (matchesLevel(
+                exercise,
+                level
+        )) {
+
+            score += 3;
+
+        } else {
+
+            score -= 3;
+        }
+
         
-        res.put("reasons", reasons);
-        return res;
+        if (matchesEquipment(
+                exercise,
+                equipment
+        )) {
+
+            score += 3;
+
+        } else {
+
+            score -= 5;
+        }
+
+        
+        if (recentExerciseIds.contains(exercise.getId())) {
+
+            score -= 3;
+        }
+
+        Map<String, Object> row = new HashMap<>();
+
+        row.put("id",exercise.getId());
+
+        row.put("name",exercise.getName());
+
+        row.put("muscleGroup",
+                exercise.getMuscleGroup()
+                        != null
+                        ? exercise.getMuscleGroup().getName()
+                        : ""
+        );
+
+        row.put("difficulty",exercise.getDifficulty());
+
+        row.put(  "score",score);
+
+        scored.add(row);
     }
+
+    // best score
+    scored.sort(
+            (a, b) ->Integer.compare( (Integer) b.get("score"), (Integer) a.get("score")  )
+    );
+
+    
+    int exerciseLimit = pickExerciseLimit( availableMinutes
+            );
+
+    if (scored.size() > exerciseLimit) {
+
+        scored = new ArrayList<>( scored.subList( 0, exerciseLimit  )  ) ;
+    }
+
+    
+    int durationPerExercise = scored.isEmpty()
+                    ? availableMinutes
+                    : availableMinutes
+                    / scored.size();
+
+    for (Map<String, Object> exercise : scored) {
+
+        exercise.put( "durationMinutes", durationPerExercise);
+    }
+
+    
+    String intensity;
+
+    if ("HIGH".equalsIgnoreCase( lastIntensity )) {
+
+        
+        intensity = "MEDIUM";
+
+    } else if ("ADVANCED".equalsIgnoreCase(level)) {
+
+        intensity = "HIGH";
+
+    } else if ("INTERMEDIATE" .equalsIgnoreCase(level)) {
+
+        intensity = "HIGH";
+
+    } else {
+
+        
+        intensity = "MEDIUM";
+    }
+
+   // explication --- reason
+    List<String> reasons = new ArrayList<>();
+
+    reasons.add( "Groupe musculaire ciblé : " + targetMuscle);
+
+    reasons.add( "Objectif : " + safe(goal)  );
+
+    reasons.add( "Niveau : " + safe(level));
+
+    reasons.add( "Équipement : " + safe(equipment) );
+
+    reasons.add( "Temps disponible : " + availableMinutes + " minutes" );
+
+    if ("HIGH".equalsIgnoreCase(lastIntensity)) {
+
+        reasons.add(
+                "La dernière séance était HIGH : " +
+                "intensité réduite à MEDIUM pour la récupération"
+        );
+    }
+
+    
+    Map<String, Object> result = new HashMap<>();
+
+    result.put( "athleteId", athlete.getId()
+    );
+
+    result.put("athleteName",
+            athlete.getFullName()
+    );
+
+    result.put(
+    "goal",
+            goal
+    );
+
+    result.put(
+    "level",
+            level
+    );
+
+    result.put(
+            "weightKg",athlete.getWeightKg()
+    );
+
+    result.put(
+            "availableMinutes", availableMinutes
+    );
+
+    result.put(
+            "focusMuscleGroup", targetMuscle
+    );
+
+    result.put(
+            "intensity", intensity
+    );
+
+    result.put(
+            "exercises", scored
+    );
+
+    result.put(
+            "reasons", reasons
+    );
+
+    return result;
+}
 
     private String pickLeast(Map<String, Integer> counts) {   //prendre le min
         if ( counts.isEmpty() ) return "FULL_BODY";
@@ -320,25 +524,48 @@ private int pickExerciseLimit(Integer availableMinutes) {
     return 4;
 }
 
-private boolean matchesGoal(Exercise exercise, String goal) {
+private boolean matchesGoal(
+        Exercise exercise, String goal
+) {
+
     if (goal == null || goal.isBlank()) {
+
         return true;
     }
 
-    String g = goal.toLowerCase();
-    String type = exercise.getType() == null ? "" : exercise.getType().toLowerCase();
-    String difficulty = exercise.getDifficulty() == null ? "" : exercise.getDifficulty().toLowerCase();
+    String g = goal.toUpperCase();
 
-    if (g.contains("prise") || g.contains("mass") || g.contains("muscle")) {
-        return type.contains("strength") || type.contains("resistance") || difficulty.contains("hard") || difficulty.contains("medium");
+    String type = exercise.getType() == null
+                    ? ""
+                    : exercise.getType() .toUpperCase();
+
+    String difficulty =
+            exercise.getDifficulty() == null
+                    ? ""
+                    : exercise.getDifficulty().toUpperCase();
+
+    // prise de muscle
+    if (g.equals("MUSCLE_GAIN")) {
+
+        return type.equals("STRENGTH") || difficulty.equals("MEDIUM") || difficulty.equals("HARD");
     }
 
-    if (g.contains("perte") || g.contains("loss") || g.contains("cardio")) {
-        return type.contains("cardio") || type.contains("hiit") || difficulty.contains("easy") || difficulty.contains("medium");
+    // force
+    if (g.equals("STRENGTH")) {
+
+        return type.equals("STRENGTH") || difficulty.equals("HARD");
     }
 
-    if (g.contains("endurance")) {
-        return type.contains("cardio") || difficulty.contains("easy") || difficulty.contains("medium");
+    // perte de poids
+    if (g.equals("WEIGHT_LOSS")) {
+
+        return type.equals("CARDIO") || type.equals("HIIT");
+    }
+
+    // endurance
+    if (g.equals("ENDURANCE")) {
+
+        return type.equals("CARDIO") || type.equals("HIIT");
     }
 
     return true;
@@ -367,18 +594,45 @@ private boolean matchesLevel(Exercise exercise, String level) {
     return true;
 }
 
-private boolean matchesEquipment(Exercise exercise, String equipment) {
-    if (equipment == null || equipment.isBlank()) {
+private boolean matchesEquipment(
+        Exercise exercise,
+        String equipment
+) {
+
+    if (equipment == null
+            || equipment.isBlank()) {
+
         return true;
     }
 
-    String userEquipment = equipment.toLowerCase();
-    String exerciseEquipment = exercise.getEquipment() == null ? "" : exercise.getEquipment().toLowerCase();
+    String athleteEquipment =equipment.toUpperCase();
 
-    if (exerciseEquipment.isBlank()) {
+    String exerciseEquipment =
+            exercise.getEquipment() == null
+                    ? ""
+                    : exercise.getEquipment().toUpperCase();
+
+    // GYM all is available
+    if (athleteEquipment.equals("GYM")) {
         return true;
     }
 
-    return exerciseEquipment.contains(userEquipment);
+    
+    if (athleteEquipment.equals(
+            "DUMBBELLS"
+    )) {
+
+        return exerciseEquipment.equals("DUMBBELLS")|| exerciseEquipment.equals("HOME");
+    }
+
+    // Home
+    if (athleteEquipment.equals(
+            "HOME"
+    )) {
+
+        return exerciseEquipment.equals("HOME");
+    }
+
+    return exerciseEquipment.equalsIgnoreCase(athleteEquipment);
 }
 }

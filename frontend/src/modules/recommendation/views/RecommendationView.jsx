@@ -1,401 +1,653 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
 import {
   getAthlete,
   getAthleteSessions,
   getSessionExercises,
-
   getNextRecommendation,
   getCustomRecommendation,
 } from '../api/recommendationApi.js'
 
 export default function RecommendationView() {
-  const [athleteIdInput, setAthleteIdInput] = useState('')
-
 
   const [athleteId, setAthleteId] = useState(null)
-
-
   const [athlete, setAthlete] = useState(null)
-
 
   const [sessions, setSessions] = useState([])
   const [selectedSessionId, setSelectedSessionId] = useState(null)
   const [sessionExercises, setSessionExercises] = useState([])
+
   const [rec, setRec] = useState(null)
+
   const [showCustomForm, setShowCustomForm] = useState(false)
+
   const [customGoal, setCustomGoal] = useState('')
   const [customLevel, setCustomLevel] = useState('')
-  
   const [customEquipment, setCustomEquipment] = useState('')
-  
   const [customAvailableMinutes, setCustomAvailableMinutes] = useState('')
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  function athleteName(a) {
-    if (!a) return ''
 
-    if (a.fullName) return a.fullName
+  //                      atlete loading automatic
 
-    if (a.name) return a.name
+  useEffect(() => { loadSelectedAthlete() }, [])
 
-    return (a.firstName || '') + ' ' + (a.lastName || '')
-  }
+  async function loadSelectedAthlete() {
 
-  function onChangeAthleteIdInput(e) {    // input
-    setAthleteIdInput(e.target.value)
-  }
+    const savedAthleteId = localStorage.getItem('selectedAthleteId')
 
-  async function loadAthlete() {     //bouton charger
- 
-    var id = Number(athleteIdInput)
-
-    if (!athleteIdInput || Number.isNaN(id) || id <= 0) {
-      setError('Id invalide')
+    if ( !savedAthleteId) {
+      setError( 'No athlete selected. load an athlete first from the Calorie Burned page')
       return
     }
 
+    const id = Number(savedAthleteId)
+
     setLoading(true)
-
     setError('')
-    setRec(null)
-
-    setSelectedSessionId(null)
-    setSessionExercises([])
 
     try {
-      var a = await getAthlete(id)
 
-      var s = await getAthleteSessions(id)
+              // ath info 
+      const athleteData = await getAthlete(id)
+
+      //history
+      const sessionsData =   await getAthleteSessions(id)
 
       setAthleteId(id)
+      setAthlete(athleteData)
+      setSessions(sessionsData)
 
-      setAthlete(a)
-      setSessions(s)
     } catch (e) {
 
       setAthleteId(null)
       setAthlete(null)
-
       setSessions([])
 
-      setError('Athlete introuvabl')
+      setError('Unable to retrieve athlete information')
+
     }
 
     setLoading(false)
   }
 
-  async function openSession(sessionId) {  // clik sur une séance
+  function athleteName(a) {
 
-
-    setSelectedSessionId(sessionId)
-    setSessionExercises([])
-
-    setError('')
-
-    try {
-
-      var ex =await getSessionExercises(sessionId)
-
-      setSessionExercises(ex)
-    } catch (e) {
-      setError(' impossible de charger les exercices')
-    }
-  }
-
-  async function onRecommend() {   // pour btn recommender
-    if (athleteId == null) return
-
-    setLoading(true)
-
-    setError('')
-
-    try {
-      var r = await getNextRecommendation(athleteId)
-      setRec(r)
-
-    } catch (e) {
-      setError('impossible de recommander')
+    if (!a) {
+      return ''
     }
 
-    setLoading(false)
-  }
-  async function onCustomRecommend() {
-  if (athleteId == null) return
+    if (a.fullName) {
+      return a.fullName
+    }
 
-  setLoading(true)
-  setError('')
+    if (a.name) {
+      return a.name
+    }
 
-  try {
-    var r = await getCustomRecommendation({
-      athleteId: athleteId,
-      goal: customGoal,
-      level: customLevel,
-      equipment: customEquipment,
-      availableMinutes: customAvailableMinutes
-        ? Number(customAvailableMinutes)
-        : null,
-    })
-
-    setRec(r)
-    setShowCustomForm(false)
-  } catch (e) {
-    setError('impossible de recommander')
-  }
-
-  setLoading(false)
-}
-
-  var athleteCard = null
-if (athlete) {
-  athleteCard = (
-    <div className="bg-white text-black p-4 rounded shadow space-y-1">
-      <div className="font-semibold">Athlete</div>
-      <div>Id: {athlete.id}</div>
-      <div>Nom: {athleteName(athlete)}</div>
-      <div>Poids: {athlete.weightKg} kg</div>
-      <div>objectif: {athlete.goal}</div>
-      <div>niveau: {athlete.level}</div>
-      <div>temps dispo: {athlete.availableMinutes} min</div>
-      <div>equipement: {athlete.equipment}</div>
-    </div>
-  )
-}
-
-  var recCard = null
-  if (rec) {
-    var exs = rec.exercises || []
-
-    var reasons = rec.reasons || []
-
-    recCard = (
-      <div className="bg-white p-4 rounded shadow space-y-3">
-
-        <div className="font-semibold">Recommandation</div>
-        <div>Focus: {rec.focusMuscleGroup}</div>
-
-        <div>Intensite: {rec.intensity}</div>
-        <div>Duree: {rec.availableMinutes} min</div>
-
-        <div>
-          <div className="font-semibold mb-2">Exercices</div>
-          <ul className="list-disc ml-5">
-
-            {exs.map(function (e) {
-  return (
-    <li key={e.id}>
-      {e.name}
-      {e.muscleGroup ? ' - ' + e.muscleGroup : ''}
-      {e.difficulty ? ' - ' + e.difficulty : ''}
-      {e.score != null ? ' - score ' + e.score : ''}
-    </li>
-  )
-})}
-          </ul>
-
-        </div>
-
-        <div>
-          <div className="font-semibold mb-2">Raison</div>
-
-          <ul className="list-disc ml-5">
-            {reasons.map(function (x, idx) {
-              return <li key={idx}>{x}</li>
-            })}
-          </ul>
-        </div>
-      </div>
+    return (
+      (a.firstName || '') + ' ' + (a.lastName || '')
     )
   }
 
+
+  // previous sesion
+
+  async function openSession(sessionId) {
+
+    setSelectedSessionId(sessionId)
+    setSessionExercises([])
+    setError('')
+
+    try {
+
+      const exercises =await getSessionExercises(sessionId)
+
+      setSessionExercises(exercises)
+
+    } catch (e) {
+
+      setError( 'unable to load session exe')
+    }
+  }
+
+
+  // recom
+
+  async function onRecommend() {
+
+    if (athleteId == null) {
+      setError('No athlete selected')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+    setRec(null)
+
+    try {
+
+      const recommendation = await getNextRecommendation(athleteId)
+
+      setRec(recommendation)
+
+    } catch (e) {
+
+      console.error(e)
+
+      setError(  'unable to generate recommendation' )
+    }
+
+    setLoading(false)
+  }
+// Custom recom
+
+  async function CustomRecommend() {
+
+    if (athleteId == null) {
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+
+      const recommendation = await getCustomRecommendation({
+
+          athleteId: athleteId,
+
+          goal: customGoal,
+
+          level: customLevel,
+
+          equipment: customEquipment,
+
+          availableMinutes:
+            customAvailableMinutes
+              ? Number(customAvailableMinutes)
+              : null,
+        })
+
+      setRec(recommendation)
+
+      setShowCustomForm(false)
+
+    } catch (e) {
+
+      setError(
+        ' unable to generate    '
+      )
+    }
+
+    setLoading(false)
+  }
+
+
   return (
-    <div className="space-y-4">
 
-      <h1 className="text-2xl font-semibold">  Recommendation</h1>
+    <div className="space-y-5 text-black">
 
-      <div className="bg-white p-4 rounded shadow space-y-3">
-        <div className="flex gap-3 items-center flex-wrap">
-          <input
-              className="border rounded p-2 w-48"
+      <h1 className="text-2xl font-semibold">
+        Recommendation
+      </h1>
 
-            placeholder="Athlete id"
-            value={athleteIdInput}
-
-            onChange={onChangeAthleteIdInput}
-          />
-
-          <button
-
-            className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
-            onClick={loadAthlete}
-
-            disabled={loading}
-          >
-            {loading ? 'Loading...' : 'Charger'}
-          </button>
-
-          <button
-            className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
-            onClick={onRecommend}
-            disabled={loading || athleteId == null}
-          >
-            {loading ? 'Loading...' : 'Recommander la prochaine séance'}
-          </button>
-          <button
-  className="bg-purple-600 text-white px-4 py-2 rounded disabled:opacity-50"
-  onClick={function () {
-    setShowCustomForm(!showCustomForm)
-  }}
-  disabled={loading || athleteId == null}
->
-  personnalised recommendation
-</button>
+      {error && (
+        <div className="bg-red-100 border border-red-300 text-red-700 p-4 rounded">
+          {error}
         </div>
+      )}
 
-        {error ? <div className="text-red-600">{error}</div> : null}
-        {showCustomForm ? (
+      {loading && (
+        <div className="bg-gray-100 p-3 rounded">
+          Loading...
+        </div>
+      )}
 
-  <div className="border rounded p-4 space-y-3 bg-gray-50">
-    <div className="font-semibold">new recommendation</div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-      <input
-        className="border rounded p-2"
+      
 
-        placeholder="Objectif"
-        value={customGoal}
-        onChange={function (e) {
-          setCustomGoal(e.target.value)
-        }}
-      />
+      {athlete && (
 
-      <input
-        className="border rounded p-2"
-        placeholder="Niveau"
-         
-        value={customLevel}
-        onChange={function (e) {
-          setCustomLevel(e.target.value)
-        }}
-      />
+        <div className="bg-white p-5 rounded shadow">
 
-      <input
-        className="border rounded p-2"
-        placeholder="Equipement"
-        value={customEquipment}
-        onChange={function (e) {
+          <div className="text-lg font-semibold">
+            Selected athlete
+          </div>
 
-          setCustomEquipment(e.target.value)
-        }}
-      />
+          <div className="mt-2 text-blue-600 font-medium">
 
-      <input
-        className="border rounded p-2"
-        placeholder="Minutes disponibles"
-        value={customAvailableMinutes}
-        onChange={function (e) {
-          setCustomAvailableMinutes(e.target.value)
-        }}
-      />
+            #{athlete.id}
+            {' — '}
+            {athleteName(athlete)}
+
+          </div>
+
+        </div>
+      )}
+
+
+      
+
+      {athlete && (
+
+        <div className="bg-white p-5 rounded shadow space-y-4">
+
+          <h2 className="text-xl font-semibold">
+            Next training session
+          </h2>
+
+          <p className="text-gray-600">
+            The recommendation automatic use the athlete goal, level, equipment, available time and training history
+          </p>
+
+          <div className="flex gap-3 flex-wrap">
+
+            <button
+              className="bg-green-600 text-white px-5 py-2 rounded disabled:opacity-50"
+              onClick={onRecommend}
+              disabled={loading}
+            >
+
+              {loading
+                ? 'Calculating...'
+                : 'Recommend next training sesion'}
+
+            </button>
+
+            <button
+              className="bg-purple-600 text-white px-5 py-2 rounded"
+              onClick={() =>
+                setShowCustomForm(!showCustomForm)
+              }
+              disabled={loading}
+            >
+
+              Custom recommendation
+
+            </button>
+
+          </div>
+
+
+          
+
+          {showCustomForm && (
+
+
+  <div className="border rounded p-4 bg-gray-50 space-y-4">
+
+
+    <h3 className="font-semibold text-lg">Custom recommendation</h3>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <select value={customGoal} onChange={(e) => setCustomGoal(e.target.value)} className="border rounded p-2 text-black">
+        <option value="">-- Select goal --</option>
+        <option value="ENDURANCE">Endurance</option>
+        <option value="STRENGTH">Strength</option>
+        <option value="MUSCLE_GAIN">Muscle gain</option>
+        <option value="WEIGHT_LOSS">Weight loss</option>
+      </select>
+
+      <select value={customLevel} onChange={(e) => setCustomLevel(e.target.value)} className="border rounded p-2 text-black">
+        <option value="">-- Select level --</option>
+        <option value="BEGINNER">Beginner</option>
+        <option value="INTERMEDIATE">Intermediate</option>
+        <option value="ADVANCED">Advanced</option>
+      </select>
+
+      <select value={customEquipment} onChange={(e) => setCustomEquipment(e.target.value)} className="border rounded p-2 text-black">
+        <option value="">-- Select equipment --</option>
+        <option value="HOME">Home</option>
+        <option value="DUMBBELLS">Dumbbells</option>
+        <option value="GYM">Gym</option>
+      </select>
+
+      <select value={customAvailableMinutes} onChange={(e) => setCustomAvailableMinutes(e.target.value)} className="border rounded p-2 text-black">
+        <option value="">-- Select duration --</option>
+        <option value="15">15 minutes</option>
+        <option value="30">30 minutes</option>
+        <option value="45">45 minutes</option>
+        <option value="60">60 minutes</option>
+        <option value="90">90 minutes</option>
+      </select>
     </div>
 
     <button
-      className="bg-purple-600 text-white px-4 py-2 rounded disabled:opacity-50"
-      onClick={onCustomRecommend}
-      disabled={loading || athleteId == null}
+      onClick={CustomRecommend}
+      disabled={loading || !customGoal || !customLevel || !customEquipment || !customAvailableMinutes}
+      className="bg-purple-600 text-white px-5 py-2 rounded disabled:opacity-50"
     >
-      {loading ? 'Loading...' : 'Generer'}
+      {loading ? 'Generating...' : 'Generate recommendation'}
     </button>
   </div>
-) : null}
-      </div>
+)}
 
-      {athleteCard}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white text-black p-4 rounded shadow">
-
-          <div className="font-semibold mb-2">historique des seances</div>
-
-          {sessions.length === 0 ? <div>Aucune seance</div> : null}
-
-          <div className="flex flex-col gap-2">
+        </div>
+      )}
 
 
-            {sessions.map(function (s) {
+      
 
-                var cls = 'text-left border rounded p-3'
-              if (selectedSessionId === s.id) {
-                  cls =cls + ' bg-gray-100'
-              }
+      {rec && (
 
-              return (
+        <div className="bg-white p-5 rounded shadow space-y-4">
+
+          <h2 className="text-xl font-semibold">
+            Recommended training session
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+            <div className="border rounded p-3">
+
+              <div className="font-semibold">
+                Muscle group
+              </div>
+
+              <div>
+                {rec.focusMuscleGroup}
+              </div>
+
+            </div>
+
+            <div className="border rounded p-3">
+
+              <div className="font-semibold">
+                Intensity
+              </div>
+
+              <div>
+                {rec.intensity}
+              </div>
+
+            </div>
+
+            <div className="border rounded p-3">
+
+              <div className="font-semibold">
+                Duration
+              </div>
+
+              <div>
+                {rec.availableMinutes} min
+              </div>
+
+            </div>
+
+          </div>
+
+          <div>
+
+            <h3 className="font-semibold text-lg mb-3">
+              Recommended exercise
+            </h3>
+
+            {(!rec.exercises ||
+              rec.exercises.length === 0) && (
+
+              <div>
+                No exercises found.
+              </div>
+            )}
+
+            <div className="space-y-2">
+
+              {(rec.exercises || []).map(
+                (exercise) => (
+
+                  <div
+                    key={exercise.id}
+                    className="border rounded p-3"
+                  >
+
+                    <div className="font-semibold">
+                      {exercise.name}
+                    </div>
+
+                    <div>
+                      Muscle:
+                      {' '}
+                      {exercise.muscleGroup}
+                    </div>
+
+                    {exercise.difficulty && (
+                      <div>
+                        Difficulty:
+                        {' '}
+                        {exercise.difficulty}
+                      </div>
+                    )}
+
+                    {exercise.durationMinutes && (
+                      <div>
+                        Duration:
+                        {' '}
+                        {exercise.durationMinutes}
+                        {' '}min
+                      </div>
+                    )}
+
+                    {exercise.score != null && (
+                      <div>
+                        Score:
+                        {' '}
+                        {exercise.score}
+                      </div>
+                    )}
+
+                  </div>
+                )
+              )}
+
+            </div>
+
+          </div>
+
+
+          
+
+          {rec.reasons &&
+            rec.reasons.length > 0 && (
+
+              <div>
+
+                <h3 className="font-semibold text-lg mb-2">
+                  Why this recommendation?
+                </h3>
+
+                <ul className="list-disc ml-6">
+
+                  {rec.reasons.map(
+                    (reason, index) => (
+
+                      <li key={index}>
+                        {reason}
+                      </li>
+
+                    )
+                  )}
+
+                </ul>
+
+              </div>
+            )}
+
+        </div>
+      )}
+
+
+      
+
+      {athlete && (
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div className="bg-white p-5 rounded shadow">
+
+            <h2 className="font-semibold text-lg mb-3">
+              Training session history
+            </h2>
+
+            {sessions.length === 0 && (
+              <div>
+                No training sessions
+              </div>
+            )}
+
+            <div className="flex flex-col gap-2">
+
+              {sessions.map((session) => (
+
                 <button
-                  key={s.id}
-                  className={cls}
-
-                  onClick={function () {
-
-                    openSession(s.id)
-                  }}
+                  key={session.id}
+                  onClick={() =>
+                    openSession(session.id)
+                  }
+                  className={
+                    'text-left border rounded p-3 ' +
+                    (
+                      selectedSessionId === session.id
+                        ? 'bg-gray-100'
+                        : ''
+                    )
+                  }
                 >
-                  <div>Date: {s.sessionDate}</div>
-                  <div>Calories: {s.totalCalories}</div>
-                  <div>Duree: {s.durationMinutes} min</div>
 
-                  <div>Intensite: {s.sessionIntensity}</div>
+                  <div>
+                    Date: {session.sessionDate}
+                  </div>
+
+                  <div>
+                    Calories:
+                    {' '}
+                    {session.totalCalories}
+                  </div>
+
+                  <div>
+                    Duration:
+                    {' '}
+                    {session.durationMinutes}
+                    {' '}min
+                  </div>
+
+                  <div>
+                    Intensity:
+                    {' '}
+                    {session.sessionIntensity}
+                  </div>
 
                 </button>
 
-              )
+              ))}
 
-            })}
+            </div>
 
           </div>
-        </div>
 
-        <div className="bg-white text-black p-4 rounded shadow">
-          <div className="font-semibold mb-2">Exercices de la seance</div>
 
-          {selectedSessionId == null ? <div>Cliquer sur une seance</div> : null}
+          
 
-          {selectedSessionId != null ? (
-            <div className="flex flex-col gap-2">
+          <div className="bg-white p-5 rounded shadow">
 
-              {sessionExercises.map(function (  se) {
-                var exName = ''
+            <h2 className="font-semibold text-lg mb-3">
+              Session exercises
+            </h2>
 
-                var muscle = ''
+            {selectedSessionId == null && (
+              <div>
+                Click on a training session
+              </div>
+            )}
 
-                if (se && se.exercise) {
-                  exName = se.exercise.name || ''
+            {selectedSessionId != null && (
 
-                  if (se.exercise.muscleGroup) {
-                    muscle = se.exercise.muscleGroup.name || ''
+              <div className="space-y-2">
+
+                {sessionExercises.map(
+                  (sessionExercise) => {
+
+                    const exercise =
+                      sessionExercise.exercise
+
+                    return (
+
+                      <div
+                        key={sessionExercise.id}
+                        className="border rounded p-3"
+                      >
+
+                        <div className="font-semibold">
+
+                          {exercise
+                            ? exercise.name
+                            : ''}
+
+                        </div>
+
+                        <div>
+                          Muscle:
+                          {' '}
+                          {exercise &&
+                          exercise.muscleGroup
+                            ? exercise
+                                .muscleGroup
+                                .name
+                            : ''}
+                        </div>
+
+                        <div>
+                          Duration:
+                          {' '}
+                          {
+                            sessionExercise
+                              .durationMinutes
+                          }
+                          {' '}min
+                        </div>
+
+                        <div>
+                          Intensity:
+                          {' '}
+                          {
+                            sessionExercise
+                              .intensity
+                          }
+                        </div>
+
+                        <div>
+                          Calories:
+                          {' '}
+                          {
+                            sessionExercise
+                              .caloriesBurned
+                          }
+                        </div>
+
+                      </div>
+                    )
                   }
-                }
+                )}
 
-                return (
-                  <div key={se.id} className="border rounded p-3">
-                    <div className="font-medium">{exName}</div>
-                    <div>Muscle: {muscle}</div>
-                    <div>Duree: {se.durationMinutes} min</div>
-                    <div>Intensite: {se.intensity}</div>
-                    <div>calories: {se.caloriesBurned}</div>
+                {sessionExercises.length ===
+                  0 && (
+
+                  <div>
+                    No exercises
                   </div>
-                )
+                )}
 
-              })}
+              </div>
+            )}
 
-              {sessionExercises.length === 0 ? <div>Aucun exercice</div> : null}
-            </div>
-            
-          ) : null}
+          </div>
+
         </div>
-      </div>
+      )}
 
-      {recCard}
     </div>
   )
 }

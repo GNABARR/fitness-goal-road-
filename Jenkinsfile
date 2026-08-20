@@ -24,13 +24,6 @@ pipeline {
 
 
 
-        stage('tag') {
-            steps { sh 'git tag v${BUILD_NUMBER}'; sh 'git push origin v${BUILD_NUMBER}' }
-        }
-
-
-
-
 
         stage('Deploy') {
             steps {

@@ -12,15 +12,16 @@ Elle permet notamment :
 ## Work Items par membre
 
 ### GNABAR ISMAIL — Calcul des apports journaliers (Nutrition)
-- **Spike (3)** : apprendre sur les méthodes de calcul des apports journaliers liés à un objectif fitness *(done)*
-- **US Back/API (3)** : implémenter le service de calcul de la quantité de calories nécessaire *(done)*
-- **US Back/API (2)** : implémenter le service de calcul de la quantité de protéines nécessaire *(done)*
-- **US Back/API (2)** : implémenter le service de calcul de la quantité de glucides nécessaire *(done)*
-- **US Back/API (2)** : implémenter le service de calcul de la quantité de healthy fats nécessaire *(done)*
-- **US Back/API (3)** : implémenter le service de correction des propositions de micronutriments et des quantités de calories après 10 jours *(done)*
-- **US Front (3)** : créer une interface d’interaction utilisateur/API (saisie des paramètres + affichage des résultats) *(in progress)*
 
----
+     - je décris ici le contenus de chaque branch ( user story ) fait dans la release R4 de rattrapage :
+
+     - us1-donnees-primaires : Création de l'entité Ingredient et de son repository avec un chargeur automatique qui peuple la table au démarrage.
+
+     - us2-algorithmes : Mise en place du service qui calcule la quantité d'un ensemble ingrédients pour atteindre les macros cibles, chaque un seul au debus et une correction et équilibrage en cas de dépassement.
+
+     - us3-frontend-travail : Création de l'interface qui envoie la demande de plan alimentaire et affiche la réponse calculée par le backend.
+
+     - us4-login-signin : Ajout de l'authentification (full stack), liaison du compte au plan nutritionnel, et sauvegarde/affichage de l'historique nutritionnel du user. ( la us été pas fait proprement avant )
 
 ### MOHAMED EL GHAZRANI — Entraînements & Recommandation
 - **Mock (2)** : création des mocks des athlètes et des séances d'entraînement *(done)*

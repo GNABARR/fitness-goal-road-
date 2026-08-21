@@ -54,7 +54,7 @@ public class PlanAlimentaireService {
 
 
 
-    private List<IngredientQuantite> corrigerVersCible(List<IngredientQuantite> collection, double cible, boolean pourProteines) {double totalActuel = 0;
+    List<IngredientQuantite> corrigerVersCible(List<IngredientQuantite> collection, double cible, boolean pourProteines) {double totalActuel = 0;
 
         for (IngredientQuantite item : collection){
             totalActuel += pourProteines ? item.getProteines() : item.getGlucides();}

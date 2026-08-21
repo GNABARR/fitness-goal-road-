@@ -35,7 +35,7 @@ public class BmiService {
         return repository.save(measure);
     }
 
-    private String categoriserBMI(double bmi) {
+    String categoriserBMI(double bmi) {
         if (bmi < 18.5) {
             return "Insuffisance pondérale";
         } else if (bmi < 25) {
